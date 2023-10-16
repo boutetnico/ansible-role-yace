@@ -1,0 +1,37 @@
+---
+yace_dependencies: []
+
+yace_version: 0.54.1
+
+yace_arch: "{{ yace_arch_map[ansible_architecture] }}"
+
+yace_user: yace
+yace_group: yace
+yace_extra_groups: []
+
+yace_path: /usr/local/bin/yace
+
+yace_config_file: /etc/yace/config.yml
+
+yace_listen_address: 127.0.0.1:5000
+
+yace_configuration:
+  apiVersion: v1alpha1
+  sts-region: eu-west-1
+  discovery:
+    exportedTagsOnMetrics:
+      kafka:
+        - Name
+    jobs:
+      - type: kafka
+        regions:
+          - eu-west-1
+        searchTags:
+          - key: env
+            value: dev
+        metrics:
+          - name: BytesOutPerSec
+            statistics:
+              - Average
+            period: 600
+            length: 600

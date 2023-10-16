@@ -1,0 +1,48 @@
+---
+- name: Ensure yace group exists
+  ansible.builtin.group:
+    name: "{{ yace_group }}"
+    state: present
+
+- name: Ensure yace user exists
+  ansible.builtin.user:
+    append: "{{ true if yace_extra_groups | length > 0 else false }}"
+    group: "{{ yace_user }}"
+    groups: "{{ yace_extra_groups }}"
+    home: /nonexistent
+    name: "{{ yace_group }}"
+    shell: /usr/sbin/nologin
+    state: present
+  when: yace_group != 'root'
+
+- name: Ensure yace config directory exists
+  ansible.builtin.file:
+    group: root
+    mode: "0755"
+    name: "{{ yace_config_file | dirname }}"
+    owner: root
+    state: directory
+
+- name: Install yace config file
+  ansible.builtin.template:
+    dest: "{{ yace_config_file }}"
+    group: root
+    mode: "0644"
+    owner: root
+    src: config.yml.j2
+  notify: Restart yace
+
+- name: Ensure systemd service file is installed
+  ansible.builtin.template:
+    dest: /etc/systemd/system/yace.service
+    group: root
+    mode: "0750"
+    owner: root
+    src: yace.service.j2
+  notify: Reload systemd daemon
+
+- name: Ensure yace service is enabled and running
+  ansible.builtin.service:
+    enabled: true
+    name: yace
+    state: started

@@ -1,0 +1,9 @@
+---
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart yace
+  ansible.builtin.service:
+    name: yace
+    state: restarted

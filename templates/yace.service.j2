@@ -1,0 +1,22 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=YACE Yet Another Cloudwatch Exporter
+After=network-online.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/yace.pid
+User={{ yace_user }}
+Group={{ yace_group }}
+PermissionsStartOnly=true
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart={{ yace_path }} \
+  -config.file={{ yace_config_file }} \
+  -listen-address={{ yace_listen_address }}
+
+SyslogIdentifier=yace
+KillMode=process
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

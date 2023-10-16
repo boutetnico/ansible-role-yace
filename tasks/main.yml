@@ -1,0 +1,18 @@
+---
+- name: Check if yace is already installed
+  ansible.builtin.stat:
+    path: "{{ yace_path }}"
+  register: _yace
+
+- name: Get yace installed version
+  ansible.builtin.command: "{{ yace_path }} --version"
+  changed_when: false
+  when: _yace.stat.exists
+  register: _yace_version
+
+- name: Include setup tasks
+  ansible.builtin.include_tasks: setup.yml
+  when: _yace_version is skipped or yace_version not in _yace_version.stdout
+
+- name: Include configuration tasks
+  ansible.builtin.include_tasks: configure.yml

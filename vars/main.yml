@@ -1,0 +1,9 @@
+---
+yace_arch_map:
+  32-bit: "386"
+  64-bit: x86_64
+  aarch64: arm64
+  amd64: x86_64
+  armv6l: armv6
+  armv7l: armv6
+  x86_64: x86_64

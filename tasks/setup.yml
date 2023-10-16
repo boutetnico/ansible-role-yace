@@ -1,0 +1,37 @@
+---
+- name: Ensure dependencies are installed
+  ansible.builtin.apt:
+    name: "{{ yace_dependencies }}"
+    state: present
+    update_cache: true
+
+- name: Download yace tarball
+  ansible.builtin.get_url:
+    dest: /tmp
+    mode: "0640"
+    url: "https://github.com/nerdswords/yet-another-cloudwatch-exporter/releases/download/v{{ yace_version }}\
+         /yet-another-cloudwatch-exporter_{{ yace_version }}_Linux_{{ yace_arch }}.tar.gz"
+
+- name: Unarchive yace tarball
+  ansible.builtin.unarchive:
+    copy: false
+    dest: /tmp
+    mode: "0750"
+    src: /tmp/yet-another-cloudwatch-exporter_{{ yace_version }}_Linux_{{ yace_arch }}.tar.gz
+
+- name: Copy yace binary to its install path
+  ansible.builtin.copy:
+    dest: "{{ yace_path }}"
+    group: root
+    mode: "0755"
+    owner: root
+    remote_src: true
+    src: /tmp/yace
+
+- name: Delete temporary archive and folder
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/yace
+    - /tmp/yet-another-cloudwatch-exporter_{{ yace_version }}_Linux_{{ yace_arch }}.tar.gz
